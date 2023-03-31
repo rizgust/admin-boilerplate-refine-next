@@ -14,11 +14,11 @@ import { AppProps } from "next/app";
 import { Header } from "@components/header";
 import { ColorModeContextProvider } from "@contexts";
 import { CssBaseline, GlobalStyles } from "@mui/material";
-import dataProvider from "@refinedev/simple-rest";
 import { appWithTranslation, useTranslation } from "next-i18next";
 import { authProvider } from "src/authProvider";
+import { restDataProvider } from "src/rest-data-provider";
 
-const API_URL = "https://api.fake-rest.refine.dev";
+const DEFAULT_REST_API_URL = "http://localhost:8055";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   noLayout?: boolean;
@@ -58,30 +58,22 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout): JSX.Element {
           <RefineSnackbarProvider>
             <Refine
               routerProvider={routerProvider}
-              dataProvider={dataProvider(API_URL)}
+              dataProvider={{
+                default: restDataProvider(DEFAULT_REST_API_URL),
+              }}
               notificationProvider={notificationProvider}
               authProvider={authProvider}
               i18nProvider={i18nProvider}
               resources={[
                 {
-                  name: "blog_posts",
-                  list: "/blog-posts",
-                  create: "/blog-posts/create",
-                  edit: "/blog-posts/edit/:id",
-                  show: "/blog-posts/show/:id",
-                  meta: {
-                    canDelete: true,
-                  },
+                  name: "_items",
+                  list: "_items/:resource",
+                  create: "_items/:resource/create",
+                  edit: "_items/:resource/edit/:id",
+                  show: "_items/:resource/show/:id",
                 },
                 {
-                  name: "categories",
-                  list: "/categories",
-                  create: "/categories/create",
-                  edit: "/categories/edit/:id",
-                  show: "/categories/show/:id",
-                  meta: {
-                    canDelete: true,
-                  },
+                  name: "_sample"
                 },
               ]}
               options={{

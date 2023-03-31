@@ -18,8 +18,9 @@ export const restDataProvider = (
   },
 
   getList: async ({ resource, pagination, filters, sorters }) => {
-    const url = `${apiUrl}/${resource}`;
-    console.log(url);
+    // const url = `${apiUrl}/${resource}`;
+    const url = `${apiUrl}/items/page`;
+    console.log(url+resource);
 
     const { current = 1, pageSize = 10, mode = "server" } = pagination ?? {};
 
@@ -51,7 +52,7 @@ export const restDataProvider = (
     const total = +headers["x-total-count"];
 
     return {
-      data,
+      data: data.data,
       total: total || data.length,
     };
   },
