@@ -1,19 +1,24 @@
-    import { ErrorComponent } from "@refinedev/mantine";
+import { MantineShowInferencer } from "@refinedev/inferencer/mantine";
 import { GetServerSideProps } from "next";
 import { authProvider } from "src/authProvider";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
-export default function CatchAll() {
-    return <ErrorComponent />;
+
+export default function BlogPostShow() {
+    return <MantineShowInferencer 
+/>;
 }
 
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
+
+    
     const { authenticated, redirectTo } = await authProvider.check(context);
 
     const translateProps = await serverSideTranslations(
         context.locale ?? "en",
         ["common"],
     );
+
 
     if (!authenticated) {
         return {
@@ -22,8 +27,8 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
             },
             redirect: {
                 destination: `${redirectTo}?to=${encodeURIComponent(
-                    context.req.url || "/"
-                )}`,
+          "/blog-posts"
+        )}`,
                 permanent: false,
             },
         };
@@ -35,4 +40,3 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
         },
     };
 };
-

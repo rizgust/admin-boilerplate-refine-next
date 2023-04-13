@@ -1,11 +1,20 @@
-    import { ErrorComponent } from "@refinedev/mantine";
+import {
+    AuthPage,
+} from "@refinedev/mantine";
+    
 import { GetServerSideProps } from "next";
-import { authProvider } from "src/authProvider";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { authProvider } from "src/authProvider";
 
-export default function CatchAll() {
-    return <ErrorComponent />;
+export default function Register() {
+    return (
+        <AuthPage
+            type="register"
+        />
+    );
 }
+
+Register.noLayout = true;
 
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
     const { authenticated, redirectTo } = await authProvider.check(context);
@@ -15,15 +24,11 @@ export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
         ["common"],
     );
 
-    if (!authenticated) {
+    if (authenticated) {
         return {
-            props: {
-                ...translateProps,
-            },
+            props: {},
             redirect: {
-                destination: `${redirectTo}?to=${encodeURIComponent(
-                    context.req.url || "/"
-                )}`,
+                destination: redirectTo ?? "/",
                 permanent: false,
             },
         };

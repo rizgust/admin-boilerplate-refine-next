@@ -1,95 +1,113 @@
-import { Refine } from "@refinedev/core";
-import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
-import {
-  Layout,
-  RefineSnackbarProvider,
-  notificationProvider,
-} from "@refinedev/mui";
-import routerProvider, {
-  UnsavedChangesNotifier,
-} from "@refinedev/nextjs-router";
-import type { NextPage } from "next";
+import React from "react";
 import { AppProps } from "next/app";
+import type { NextPage } from "next";
+import { Refine, } from '@refinedev/core';
+import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
+    import { notificationProvider
+,ThemedLayout
+,RefineThemes} from '@refinedev/mantine';
+import routerProvider, { UnsavedChangesNotifier } from "@refinedev/nextjs-router";
 
-import { Header } from "@components/header";
-import { ColorModeContextProvider } from "@contexts";
-import { CssBaseline, GlobalStyles } from "@mui/material";
+import dataProvider from "@refinedev/simple-rest";
+import { MantineProvider, Global, ColorScheme, ColorSchemeProvider} from "@mantine/core";
+import { NotificationsProvider } from "@mantine/notifications";
+import { useLocalStorage } from "@mantine/hooks";
 import { appWithTranslation, useTranslation } from "next-i18next";
+import { Header } from "@components/header"
 import { authProvider } from "src/authProvider";
-import { restDataProvider } from "src/rest-data-provider";
 
-const DEFAULT_REST_API_URL = "http://localhost:8055";
+const API_URL = "https://api.fake-rest.refine.dev";
+
+
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  noLayout?: boolean;
-};
+     noLayout?: boolean;
+ };
 
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
-};
+ type AppPropsWithLayout = AppProps & {
+     Component: NextPageWithLayout;
+ };
 
 function MyApp({ Component, pageProps }: AppPropsWithLayout): JSX.Element {
-  const renderComponent = () => {
-    if (Component.noLayout) {
-      return <Component {...pageProps} />;
-    }
+    const renderComponent = () => {
+        if (Component.noLayout) {
+            return <Component {...pageProps} />;
+        }
+            return (
+                <ThemedLayout
+                    Header={Header}
+                >
+                    <Component {...pageProps} />
+                </ThemedLayout>
+            );
+    };
 
+    const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
+                key: "mantine-color-scheme",
+                defaultValue: "light",
+                getInitialValueInEffect: true,
+            });
+    const { t, i18n } = useTranslation();
+    const toggleColorScheme = (value?: ColorScheme) => setColorScheme(value || (colorScheme === "dark" ? "light" : "dark"));
+
+    const i18nProvider = {
+        translate: (key: string, params: object) => t(key, params),
+        changeLocale: (lang: string) => i18n.changeLanguage(lang),
+        getLocale: () => i18n.language,
+    };
+            
     return (
-      <Layout Header={Header}>
-        <Component {...pageProps} />
-      </Layout>
-    );
-  };
+        <>
+        <RefineKbarProvider>
+            <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+                {/* You can change the theme colors here. example: theme={{ ...RefineThemes.Magenta, colorScheme:colorScheme }} */}
+                <MantineProvider theme={{ ...RefineThemes.Blue, colorScheme:colorScheme }} withNormalizeCSS withGlobalStyles>
+                    <Global styles={{ body: { WebkitFontSmoothing: "auto" } }} />
+                    <NotificationsProvider position="top-right">
+                        <Refine 
+                            routerProvider={routerProvider}
+                            dataProvider={dataProvider(API_URL)}
+                            notificationProvider={notificationProvider}
+                            authProvider={authProvider}
+                            i18nProvider={i18nProvider}
+                            resources={[
+                                {
+                                    name: "blog_posts",
+                                    list: "/blog-posts",
+                                    create: "/blog-posts/create",
+                                    edit: "/blog-posts/edit/:id",
+                                    show: "/blog-posts/show/:id",
+                                    meta: {
+                                        canDelete: true,
+                                    },
+                                },
+                                {
+                                    name: "categories",
+                                    list: "/categories",
+                                    create: "/categories/create",
+                                    edit: "/categories/edit/:id",
+                                    show: "/categories/show/:id",
+                                    meta: {
+                                        canDelete: true,
+                                    },
+                                }
+                            ]}
+                            options={{
+                                syncWithLocation: true,
+                                warnWhenUnsavedChanges: true,
+                            }}
+                        >
+                            {renderComponent()}
+                            <RefineKbar />
+                            <UnsavedChangesNotifier />
+                        </Refine>
+                    </NotificationsProvider>
+                </MantineProvider>
+            </ColorSchemeProvider>
+        </RefineKbarProvider>
+        </>
+      );
+};
 
-  const { t, i18n } = useTranslation();
-
-  const i18nProvider = {
-    translate: (key: string, params: object) => t(key, params),
-    changeLocale: (lang: string) => i18n.changeLanguage(lang),
-    getLocale: () => i18n.language,
-  };
-
-  return (
-    <>
-      <RefineKbarProvider>
-        <ColorModeContextProvider>
-          <CssBaseline />
-          <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
-          <RefineSnackbarProvider>
-            <Refine
-              routerProvider={routerProvider}
-              dataProvider={{
-                default: restDataProvider(DEFAULT_REST_API_URL),
-              }}
-              notificationProvider={notificationProvider}
-              authProvider={authProvider}
-              i18nProvider={i18nProvider}
-              resources={[
-                {
-                  name: "_items",
-                  list: "_items/:resource",
-                  create: "_items/:resource/create",
-                  edit: "_items/:resource/edit/:id",
-                  show: "_items/:resource/show/:id",
-                },
-                {
-                  name: "_sample"
-                },
-              ]}
-              options={{
-                syncWithLocation: true,
-                warnWhenUnsavedChanges: true,
-              }}
-            >
-              {renderComponent()}
-              <RefineKbar />
-              <UnsavedChangesNotifier />
-            </Refine>
-          </RefineSnackbarProvider>
-        </ColorModeContextProvider>
-      </RefineKbarProvider>
-    </>
-  );
-}
 
 export default appWithTranslation(MyApp);

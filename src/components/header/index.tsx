@@ -1,96 +1,105 @@
-import { DarkModeOutlined, LightModeOutlined } from "@mui/icons-material";
-import {
-  AppBar,
-  Avatar,
-  FormControl,
-  IconButton,
-  MenuItem,
-  Select,
-  Stack,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import { useGetIdentity } from "@refinedev/core";
-import Link from "next/link";
+import { useGetIdentity, useGetLocale } from "@refinedev/core";
 import { useRouter } from "next/router";
-import React, { useContext } from "react";
-
-import { ColorModeContext } from "@contexts";
+import Link from "next/link";
+import {
+    ActionIcon,
+    Group,
+    Header as MantineHeader,
+    Title,
+    Avatar,
+    Menu,
+    useMantineColorScheme,
+    useMantineTheme,
+} from "@mantine/core";
+import { IconLanguage, IconMoonStars, IconSun } from "@tabler/icons";
 
 interface IUser {
-  name: string;
-  avatar: string;
+    name: string;
+    avatar: string;
 }
 
 export const Header: React.FC = () => {
-  const { mode, setMode } = useContext(ColorModeContext);
-  const { locale: currentLocale, locales, pathname, query } = useRouter();
+    const { data: user } = useGetIdentity<IUser>();
 
-  const { data: user } = useGetIdentity<IUser>();
-  const showUserInfo = user && (user.name || user.avatar);
+    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+    const theme = useMantineTheme();
+    const dark = colorScheme === "dark";
+    const borderColor = dark ? theme.colors.dark[6] : theme.colors.gray[2];
 
-  return (
-    <AppBar color="default" position="sticky" elevation={1}>
-      <Toolbar>
-        <Stack
-          direction="row"
-          width="100%"
-          justifyContent="flex-end"
-          alignItems="center"
-        >
-          <IconButton
-            onClick={() => {
-              setMode();
+    const locale = useGetLocale();
+    const currentLocale = locale();
+    const { locales } = useRouter();
+
+    return (
+        <MantineHeader
+            zIndex={199}
+            height={64}
+            py={6}
+            px="sm"
+            sx={{
+                borderBottom: `1px solid ${borderColor}`,
             }}
-          >
-            {mode === "dark" ? <LightModeOutlined /> : <DarkModeOutlined />}
-          </IconButton>
-          <FormControl sx={{ m: 1, minWidth: 120 }}>
-            <Select
-              disableUnderline
-              defaultValue={currentLocale}
-              inputProps={{ "aria-label": "Without label" }}
-              variant="standard"
+        >
+            <Group
+                position="right"
+                align="center"
+                sx={{
+                    height: "100%",
+                }}
             >
-              {[...(locales ?? [])].sort().map((lang: string) => (
-                <MenuItem
-                  component={Link}
-                  href={{ pathname, query }}
-                  locale={lang}
-                  selected={currentLocale === lang}
-                  key={lang}
-                  defaultValue={lang}
-                  value={lang}
+                <Menu shadow="md">
+                    <Menu.Target>
+                        <ActionIcon variant="outline">
+                            <IconLanguage size={18} />
+                        </ActionIcon>
+                    </Menu.Target>
+
+                    <Menu.Dropdown>
+                        {[...(locales ?? [])].sort().map((lang: string) => (
+                            <Menu.Item
+                                key={lang}
+                                component={Link}
+                                href="/"
+                                locale={lang}
+                                color={
+                                    lang === currentLocale
+                                        ? "primary"
+                                        : undefined
+                                }
+                                icon={
+                                    <Avatar
+                                        src={`/images/flags/${lang}.svg`}
+                                        size={18}
+                                        radius="lg"
+                                    />
+                                }
+                            >
+                                {lang === "en" ? "English" : "German"}
+                            </Menu.Item>
+                        ))}
+                    </Menu.Dropdown>
+                </Menu>
+
+                <ActionIcon
+                    variant="outline"
+                    color={dark ? "yellow" : "primary"}
+                    onClick={() => toggleColorScheme()}
+                    title="Toggle color scheme"
                 >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Avatar
-                      sx={{
-                        width: "16px",
-                        height: "16px",
-                        marginRight: "5px",
-                      }}
-                      src={`/images/flags/${lang}.svg`}
-                    />
-                    {lang === "en" ? "English" : "German"}
-                  </Stack>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {showUserInfo && (
-            <Stack direction="row" gap="16px" alignItems="center">
-              {user.avatar && <Avatar src={user?.avatar} alt={user?.name} />}
-              {user.name && (
-                <Typography variant="subtitle2">{user?.name}</Typography>
-              )}
-            </Stack>
-          )}
-        </Stack>
-      </Toolbar>
-    </AppBar>
-  );
+                    {dark ? <IconSun size={18} /> : <IconMoonStars size={18} />}
+                </ActionIcon>
+
+                {(user?.name || user?.avatar) && (
+                    <Group spacing="xs">
+                        {user?.name && <Title order={6}>{user?.name}</Title>}
+                        <Avatar
+                            src={user?.avatar}
+                            alt={user?.name}
+                            radius="xl"
+                        />
+                    </Group>
+                )}
+            </Group>
+        </MantineHeader>
+    );
 };

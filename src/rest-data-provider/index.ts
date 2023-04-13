@@ -5,22 +5,15 @@ import { stringify } from "@refinedev/simple-rest";
 import { DataProvider } from "@refinedev/core";
 import { axiosInstance, generateSort, generateFilter } from "./utils";
 
-export const restDataProvider = (
+export const dataProvider = (
   apiUrl: string,
   httpClient: AxiosInstance = axiosInstance
 ): Omit<
   Required<DataProvider>,
   "createMany" | "updateMany" | "deleteMany"
 > => ({
-
-  getApiUrl: () => {
-    return apiUrl;
-  },
-
   getList: async ({ resource, pagination, filters, sorters }) => {
-    // const url = `${apiUrl}/${resource}`;
-    const url = `${apiUrl}/items/page`;
-    console.log(url+resource);
+    const url = `${apiUrl}/${resource}`;
 
     const { current = 1, pageSize = 10, mode = "server" } = pagination ?? {};
 
@@ -52,7 +45,7 @@ export const restDataProvider = (
     const total = +headers["x-total-count"];
 
     return {
-      data: data.data,
+      data,
       total: total || data.length,
     };
   },
@@ -107,6 +100,10 @@ export const restDataProvider = (
     return {
       data,
     };
+  },
+
+  getApiUrl: () => {
+    return apiUrl;
   },
 
   custom: async ({

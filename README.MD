@@ -1,4 +1,4 @@
-# prototype
+# webadmin
 
 <div align="center" style="margin: 30px;">
     <a href="https://refine.dev">
@@ -8,43 +8,6 @@
 <br/>
 
 This [refine](https://github.com/pankod/refine) project was generated with [superplate](https://github.com/pankod/refine).
-
-## Features
-
-Core library:
-
-- ⚡ [Refine.dev](https://refine.dev) rapid development of web applications
-  - Data providers
-    - Graphql Data provider
-    - Rest API data provider
-    - Appwrite
-    - Airtable
-    - NestJs
-    - Supabase
-    - etc.
-  - Auth Providers
-    - Auth0
-    - Keycloack
-    - Okta
-    - Google Auth
-  - UI frameworks 
-    - MUI
-    - AntD
-    - Chakra
-    - Mantine
-    - CustomUI
-  - Access Control
-    - Carbos
-    - Casbin
-  - React Table
-  - React Hook Form
-- ⚡ [Next.js](https://nextjs.org) for Server Side Rendering
-- State M
-
-
-## Requirements
-
-- Node.js 14+ and npm
 
 ## Getting Started
 
@@ -77,10 +40,10 @@ Refine offers lots of out-of-the box functionality for rapid development, withou
 To learn more about **refine**, please check out the [Documentation](https://refine.dev/docs)
 
 - **REST Data Provider** [Docs](https://refine.dev/docs/core/providers/data-provider/#overview)
-- **Material UI** [Docs](https://refine.dev/docs/ui-frameworks/mui/tutorial/)
 - **Inferencer** [Docs](https://refine.dev/docs/packages/documentation/inferencer)
 - **Custom Auth Provider** [Docs](https://refine.dev/docs/core/providers/auth-provider/)
 - **i18n** [Docs](https://refine.dev/docs/core/providers/i18n-provider/)
+
 
 ## License
 
