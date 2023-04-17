@@ -25,6 +25,12 @@
       "@components": [
         "src/components"
       ],
+      "@restDataProvider/*": [
+        "src/rest-data-provider/*"
+      ],
+      "@restDataProvider": [
+        "src/rest-data-provider"
+      ],
       "@contexts/*": [
         "src/contexts/*"
       ],

@@ -8,15 +8,21 @@ import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 ,RefineThemes} from '@refinedev/mantine';
 import routerProvider, { UnsavedChangesNotifier } from "@refinedev/nextjs-router";
 
-import dataProvider from "@refinedev/simple-rest";
+import restDataProvider from "@refinedev/simple-rest";
+import graphqlDataProvider from "@refinedev/graphql";
+import { dataProvider as mvDataProvider } from "@restDataProvider";
 import { MantineProvider, Global, ColorScheme, ColorSchemeProvider} from "@mantine/core";
 import { NotificationsProvider } from "@mantine/notifications";
 import { useLocalStorage } from "@mantine/hooks";
 import { appWithTranslation, useTranslation } from "next-i18next";
 import { Header } from "@components/header"
 import { authProvider } from "src/authProvider";
+import { GraphQLClient } from "@refinedev/graphql";
 
-const API_URL = "https://api.fake-rest.refine.dev";
+const MV_API_URL = "https://api.fake-rest.refine.dev";
+const REST_API_URL = "https://api.fake-rest.refine.dev";
+const GRAPQL_API_URL = "https://your-graphql-url/graphql";
+const grapQlClient = new GraphQLClient(GRAPQL_API_URL);
 
 
 
@@ -66,7 +72,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout): JSX.Element {
                     <NotificationsProvider position="top-right">
                         <Refine 
                             routerProvider={routerProvider}
-                            dataProvider={dataProvider(API_URL)}
+                            dataProvider={{
+                                default: mvDataProvider(MV_API_URL),
+                                rest: restDataProvider(REST_API_URL),
+                                graphql: graphqlDataProvider(grapQlClient)
+                            }}
                             notificationProvider={notificationProvider}
                             authProvider={authProvider}
                             i18nProvider={i18nProvider}
