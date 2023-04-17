@@ -31,6 +31,12 @@
       "@restDataProvider": [
         "src/rest-data-provider"
       ],
+      "@interfaces/*": [
+        "src/interfaces/*"
+      ],
+      "@interfaces": [
+        "src/interfaces"
+      ],
       "@contexts/*": [
         "src/contexts/*"
       ],
