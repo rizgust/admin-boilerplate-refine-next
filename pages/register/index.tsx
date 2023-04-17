@@ -1,4 +1,4 @@
-import { AuthPage } from "@components/pages/auth";
+import { AuthPage } from "@components/auth";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { mvAuthProvider } from "src/mvAuthProvider";
