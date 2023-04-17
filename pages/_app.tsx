@@ -17,6 +17,7 @@ import { CssBaseline, GlobalStyles } from "@mui/material";
 import { appWithTranslation, useTranslation } from "next-i18next";
 import { ColorModeContextProvider } from "@contexts";
 import { Header } from "@components/header";
+import { mvAuthProvider } from "src/mvAuthProvider";
 
 const MV_API_URL = "https://api.fake-rest.refine.dev";
 const REST_API_URL = "https://api.fake-rest.refine.dev";
@@ -40,67 +41,6 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
         changeLocale: (lang: string) => i18n.changeLanguage(lang),
         getLocale: () => i18n.language,
     };
-    
-    const { data, status } = useSession();
-    const router = useRouter();
-    const { to } = router.query;
-    if (status === "loading") {
-        return <span>loading...</span>;
-    }
-    const authProvider: AuthBindings = {
-        login: async () => {
-            signIn("auth0", {
-                    callbackUrl: to ? to.toString() : "/",
-                    redirect: true,
-                });
-
-                return {
-                    success: true,
-                };
-        },
-        logout: async () => {
-            signOut({
-                redirect: true,
-                callbackUrl: "/login",
-            });
-
-            return {
-                success: true,
-            };
-        },
-        onError: async (error) => {
-            console.error(error);
-            return {
-                error,
-            };
-        },
-        check: async () => {
-            if (status === "unauthenticated") {
-                return {
-                    authenticated: false,
-                    redirectTo: "/login",
-                };
-            }
-
-            return {
-                authenticated: true,
-            };
-        },
-        getPermissions: async () => {
-            return null;
-        },
-        getIdentity: async () => {
-            if (data?.user) {
-                const { user } = data;
-                return {
-                    name: user.name,
-                    avatar: user.image,
-                };
-            }
-
-            return null;
-        },
-    };
 
     return (
         <>
@@ -117,7 +57,7 @@ export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
                             graphql: graphqlDataProvider(grapQlClient)
                         }}
                         notificationProvider={notificationProvider}
-                        authProvider={authProvider}
+                        authProvider={mvAuthProvider}
                         i18nProvider={i18nProvider}
                         resources={[
                             {
