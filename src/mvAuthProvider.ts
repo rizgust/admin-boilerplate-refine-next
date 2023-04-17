@@ -16,7 +16,7 @@ const mockUsers = [
     },
 ];
 
-export const authProvider: AuthBindings = {
+export const mvAuthProvider: AuthBindings = {
     login: async ({ email, username, password, remember }) => {
         // Suppose we actually send a request to the back end here.
         const user = mockUsers[0];

@@ -1,37 +1,40 @@
-import { MantineCreateInferencer } from "@refinedev/inferencer/mantine";
+import { MuiCreateInferencer } from "@refinedev/inferencer/mui";
 import { GetServerSideProps } from "next";
-import { authProvider } from "src/authProvider";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../api/auth/[...nextauth]";
 
 export default function BlogPostCreate() {
-    return <MantineCreateInferencer 
+    return <MuiCreateInferencer 
 />;
 }
 
 export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
+      const session = await getServerSession(
+        context.req,
+        context.res,
+        authOptions,
+    );
     
-    const { authenticated, redirectTo } = await authProvider.check(context);
 
     const translateProps = await serverSideTranslations(
         context.locale ?? "en",
         ["common"],
     );
 
-
-    if (!authenticated) {
+    if (!session) {
         return {
             props: {
                 ...translateProps,
             },
             redirect: {
-                destination: `${redirectTo}?to=${encodeURIComponent(
-          "/blog-posts"
-        )}`,
+                destination: `/login?to=${encodeURIComponent("/blog-posts")}`,
                 permanent: false,
             },
         };
     }
+
 
     return {
         props: {

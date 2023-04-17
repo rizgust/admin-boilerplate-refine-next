@@ -1,9 +1,7 @@
-// "axios" package needs to be installed
-import { AxiosInstance } from "axios";
-// "stringify" function is re-exported from "query-string" package by "@refinedev/simple-rest"
-import { stringify } from "@refinedev/simple-rest";
 import { DataProvider } from "@refinedev/core";
 import { axiosInstance, generateSort, generateFilter } from "./utils";
+import { AxiosInstance } from "axios";
+import { stringify } from "query-string";
 
 export const dataProvider = (
   apiUrl: string,

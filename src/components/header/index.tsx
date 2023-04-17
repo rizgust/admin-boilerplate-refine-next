@@ -1,105 +1,134 @@
-import { useGetIdentity, useGetLocale } from "@refinedev/core";
+import React, { useContext } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { useGetIdentity } from "@refinedev/core";
+import { RefineThemedLayoutV2HeaderProps, HamburgerMenu } from "@refinedev/mui";
 import {
-    ActionIcon,
-    Group,
-    Header as MantineHeader,
-    Title,
+    AppBar,
+    IconButton,
     Avatar,
-    Menu,
-    useMantineColorScheme,
-    useMantineTheme,
-} from "@mantine/core";
-import { IconLanguage, IconMoonStars, IconSun } from "@tabler/icons";
+    Stack,
+    FormControl,
+    MenuItem,
+    Select,
+    Toolbar,
+    Typography,
+} from "@mui/material";
+import { DarkModeOutlined, LightModeOutlined } from "@mui/icons-material";
+
+import { ColorModeContext } from "@contexts";
 
 interface IUser {
     name: string;
     avatar: string;
 }
 
-export const Header: React.FC = () => {
+export const Header: React.FC<RefineThemedLayoutV2HeaderProps> = () => {
+    const { mode, setMode } = useContext(ColorModeContext);
+    const { locale: currentLocale, locales, pathname, query } = useRouter();
+
     const { data: user } = useGetIdentity<IUser>();
 
-    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const theme = useMantineTheme();
-    const dark = colorScheme === "dark";
-    const borderColor = dark ? theme.colors.dark[6] : theme.colors.gray[2];
-
-    const locale = useGetLocale();
-    const currentLocale = locale();
-    const { locales } = useRouter();
-
     return (
-        <MantineHeader
-            zIndex={199}
-            height={64}
-            py={6}
-            px="sm"
-            sx={{
-                borderBottom: `1px solid ${borderColor}`,
-            }}
-        >
-            <Group
-                position="right"
-                align="center"
-                sx={{
-                    height: "100%",
-                }}
-            >
-                <Menu shadow="md">
-                    <Menu.Target>
-                        <ActionIcon variant="outline">
-                            <IconLanguage size={18} />
-                        </ActionIcon>
-                    </Menu.Target>
-
-                    <Menu.Dropdown>
-                        {[...(locales ?? [])].sort().map((lang: string) => (
-                            <Menu.Item
-                                key={lang}
-                                component={Link}
-                                href="/"
-                                locale={lang}
-                                color={
-                                    lang === currentLocale
-                                        ? "primary"
-                                        : undefined
-                                }
-                                icon={
-                                    <Avatar
-                                        src={`/images/flags/${lang}.svg`}
-                                        size={18}
-                                        radius="lg"
-                                    />
-                                }
+        <AppBar position="sticky">
+            <Toolbar>
+                <Stack direction="row" width="100%" alignItems="center">
+                    <HamburgerMenu />
+                    <Stack
+                        direction="row"
+                        width="100%"
+                        justifyContent="flex-end"
+                        alignItems="center"
+                        gap="16px"
+                    >
+                        <FormControl sx={{ minWidth: 64 }}>
+                            <Select
+                                disableUnderline
+                                defaultValue={currentLocale}
+                                inputProps={{ "aria-label": "Without label" }}
+                                variant="standard"
+                                sx={{
+                                    color: "inherit",
+                                    "& .MuiSvgIcon-root": {
+                                        color: "inherit",
+                                    },
+                                    "& .MuiStack-root > .MuiTypography-root": {
+                                        display: {
+                                            xs: "none",
+                                            sm: "block",
+                                        },
+                                    },
+                                }}
                             >
-                                {lang === "en" ? "English" : "German"}
-                            </Menu.Item>
-                        ))}
-                    </Menu.Dropdown>
-                </Menu>
+                                {[...(locales ?? [])]
+                                    .sort()
+                                    .map((lang: string) => (
+                                        // @ts-ignore
+                                        <MenuItem
+                                            component={Link}
+                                            href={{ pathname, query }}
+                                            locale={lang}
+                                            selected={currentLocale === lang}
+                                            key={lang}
+                                            defaultValue={lang}
+                                            value={lang}
+                                        >
+                                            <Stack
+                                                direction="row"
+                                                alignItems="center"
+                                                justifyContent="center"
+                                            >
+                                                <Avatar
+                                                    sx={{
+                                                        width: "24px",
+                                                        height: "24px",
+                                                        marginRight: "5px",
+                                                    }}
+                                                    src={`/images/flags/${lang}.svg`}
+                                                />
+                                                <Typography>{lang === "en" ? "English" : "German"}</Typography>
+                                            </Stack>
+                                        </MenuItem>
+                                    ))}
+                            </Select>
+                        </FormControl>
 
-                <ActionIcon
-                    variant="outline"
-                    color={dark ? "yellow" : "primary"}
-                    onClick={() => toggleColorScheme()}
-                    title="Toggle color scheme"
-                >
-                    {dark ? <IconSun size={18} /> : <IconMoonStars size={18} />}
-                </ActionIcon>
+                        <IconButton
+                            color="inherit"
+                            onClick={() => {
+                                setMode();
+                            }}
+                        >
+                            {mode === "dark" ? (
+                                <LightModeOutlined />
+                            ) : (
+                                <DarkModeOutlined />
+                            )}
+                        </IconButton>
 
-                {(user?.name || user?.avatar) && (
-                    <Group spacing="xs">
-                        {user?.name && <Title order={6}>{user?.name}</Title>}
-                        <Avatar
-                            src={user?.avatar}
-                            alt={user?.name}
-                            radius="xl"
-                        />
-                    </Group>
-                )}
-            </Group>
-        </MantineHeader>
+                        {(user?.avatar || user?.name) && (
+                            <Stack
+                                direction="row"
+                                gap="16px"
+                                alignItems="center"
+                                justifyContent="center"
+                            >
+                                {user?.name && (
+                                    <Typography
+                                        sx={{
+                                            display: { xs: "none", sm: "inline-block" },
+                                        }}
+                                        variant="subtitle2"
+                                    >
+                                        {user?.name}
+                                    </Typography>
+                                )}
+                                <Avatar src={user?.avatar} alt={user?.name} />
+                            </Stack>
+                        )}
+                    </Stack>
+                </Stack>
+            </Toolbar>
+        </AppBar>
     );
 };
