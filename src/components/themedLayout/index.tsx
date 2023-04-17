@@ -2,6 +2,7 @@ import React from "react";
 import { ThemedLayoutContextProvider } from "@refinedev/mui";
 import { ThemedHeaderV2 as DefaultHeader } from "./header";
 import { ThemedSiderV2 as DefaultSider } from "./sider";
+import { ThemedTitleV2 as DefaultTitle } from "./title";
 import { Box } from "@mui/material";
 import type { RefineThemedLayoutV2Props } from "@refinedev/mui";
 
@@ -19,7 +20,7 @@ export const ThemedLayoutV2: React.FC<RefineThemedLayoutV2Props> = ({
   return (
     <ThemedLayoutContextProvider>
       <Box display="flex" flexDirection="row">
-        <SiderToRender Title={Title} />
+        <SiderToRender Title={DefaultTitle} />
         <Box
           sx={{
             display: "flex",
